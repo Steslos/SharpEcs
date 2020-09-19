@@ -1,31 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace Steslos.SharpEcs
+namespace SharpEcs
 {
     internal sealed class ComponentManager
     {
         private readonly Dictionary<string, IComponentCache> componentCaches = new Dictionary<string, IComponentCache>();
-        private readonly Dictionary<string, Signature> componentSignatures = new Dictionary<string, Signature>();
-        private int nextComponentSignatureBit = 0;
-        private readonly Dictionary<string, object> singletonComponents = new Dictionary<string, object>();
+        private int nextComponentTypeBit = 0;
 
         public void AddComponent<T>(Entity entity, T component)
-            where T : class
-        {
-            var componentName = typeof(T).Name;
-            Debug.Assert(componentCaches.ContainsKey(componentName), "Component not registered before use.");
-            GetComponentCache<T>().InsertData(entity, component);
-        }
-
-        public void AddSingletonComponent<T>(T component)
-            where T : class
-        {
-            var componentName = typeof(T).Name;
-            Debug.Assert(singletonComponents.ContainsKey(componentName), "Singleton component not registered before use.");
-            Debug.Assert(singletonComponents[componentName] == null, "Singleton component attempted to be overwritten.");
-            singletonComponents[componentName] = component;
-        }
+            => GetComponentCache<T>().InsertData(entity, component);
 
         public void EntityDestroyed(Entity entity)
         {
@@ -36,66 +20,25 @@ namespace Steslos.SharpEcs
         }
 
         public T GetComponent<T>(Entity entity)
-            where T : class
-        {
-            var componentName = typeof(T).Name;
-            Debug.Assert(componentCaches.ContainsKey(componentName), "Component not registered before use.");
-            return GetComponentCache<T>().GetData(entity);
-        }
+            => GetComponentCache<T>().GetData(entity);
 
         public Signature GetComponentSignature<T>()
-            where T : class
-        {
-            var componentName = typeof(T).Name;
-            Debug.Assert(componentSignatures.ContainsKey(componentName), "Component not registered before use.");
-            return componentSignatures[componentName];
-        }
-
-        public T GetSingletonComponent<T>()
-            where T : class
-        {
-            var componentName = typeof(T).Name;
-            Debug.Assert(singletonComponents.ContainsKey(componentName), "Singleton component not registered before use.");
-            return (T)singletonComponents[componentName];
-        }
+            => GetComponentCache<T>().Signature;
 
         public void RegisterComponent<T>()
-            where T : class
         {
             var componentName = typeof(T).Name;
-            Debug.Assert(!componentSignatures.ContainsKey(componentName), "Component already registered.");
-            Debug.Assert(!singletonComponents.ContainsKey(componentName), "Component already registered as a singleton.");
-            componentCaches.Add(componentName, new ComponentCache<T>());
-            componentSignatures.Add(componentName, new Signature(nextComponentSignatureBit));
-            nextComponentSignatureBit++;
-        }
-
-        public void RegisterSingletonComponent<T>()
-            where T : class
-        {
-            var componentName = typeof(T).Name;
-            Debug.Assert(!singletonComponents.ContainsKey(componentName), "Singleton component already registered.");
-            Debug.Assert(!componentSignatures.ContainsKey(componentName), "Singleton component already registered as a non-singleton.");
-            singletonComponents.Add(componentName, null);
+            Debug.Assert(!componentCaches.ContainsKey(componentName), "Registering component more than once.");
+            var componentCache = new ComponentCache<T>();
+            componentCache.Signature.EnableBit(nextComponentTypeBit);
+            componentCaches.Add(componentName, componentCache);
+            nextComponentTypeBit++;
         }
 
         public void RemoveComponent<T>(Entity entity)
-            where T : class
-        {
-            var componentName = typeof(T).Name;
-            Debug.Assert(componentCaches.ContainsKey(componentName), "Component not registered before use.");
-            GetComponentCache<T>().RemoveData(entity);
-        }
-
-        public void RemoveSingletonComponent<T>()
-            where T : class
-        {
-            var componentName = typeof(T).Name;
-            singletonComponents.Remove(componentName);
-        }
+            => GetComponentCache<T>().RemoveData(entity);
 
         private ComponentCache<T> GetComponentCache<T>()
-            where T : class
         {
             var componentName = typeof(T).Name;
             Debug.Assert(componentCaches.ContainsKey(componentName), "Component not registered before use.");

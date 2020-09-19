@@ -1,23 +1,17 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
 
-namespace Steslos.SharpEcs
+namespace SharpEcs
 {
     internal sealed class ComponentCache<T> : IComponentCache
-        where T : class
     {
-        private T[] componentCache = new T[Entity.MaximumEntities];
+        public Signature Signature { get; } = new Signature();
 
-        public ComponentCache()
-        {
-            for (var i = 0; i < componentCache.Length; i++)
-            {
-                componentCache[i] = null;
-            }
-        }
+        private readonly Dictionary<Entity, T> entityComponents = new Dictionary<Entity, T>();
 
         public void EntityDestroyed(Entity entity)
         {
-            if (componentCache[entity.Id] != null)
+            if (entityComponents.ContainsKey(entity))
             {
                 RemoveData(entity);
             }
@@ -25,20 +19,20 @@ namespace Steslos.SharpEcs
 
         public T GetData(Entity entity)
         {
-            Debug.Assert(componentCache[entity.Id] != null, "Retrieving non-existant component.");
-            return componentCache[entity.Id];
+            Debug.Assert(entityComponents.ContainsKey(entity), "Getting component that the entity does not have.");
+            return entityComponents[entity];
         }
 
         public void InsertData(Entity entity, T component)
         {
-            Debug.Assert(componentCache[entity.Id] == null, "Component added to the same entity more than once.");
-            componentCache[entity.Id] = component;
+            Debug.Assert(!entityComponents.ContainsKey(entity), "Adding component to same entity more than once.");
+            entityComponents.Add(entity, component);
         }
 
         public void RemoveData(Entity entity)
         {
-            Debug.Assert(componentCache[entity.Id] != null, "Removing non-existant component.");
-            componentCache[entity.Id] = null;
+            Debug.Assert(entityComponents.ContainsKey(entity), "Removing a component that the entity does not have.");
+            entityComponents.Remove(entity);
         }
     }
 }

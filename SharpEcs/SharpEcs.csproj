@@ -3,10 +3,10 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Platforms>x64</Platforms>
-    <RootNamespace>Steslos.SharpEcs</RootNamespace>
-    <AssemblyName>Steslos.SharpEcs</AssemblyName>
+    <RootNamespace>SharpEcs</RootNamespace>
+    <AssemblyName>SharpEcs</AssemblyName>
     <OutputType>Library</OutputType>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
     <Authors>Steslos</Authors>
     <Description>Entity-component-system library for C# applications and games.</Description>
     <Copyright>2020 Steslos</Copyright>
@@ -17,6 +17,11 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <OutputPath>bin\x64-Debug\</OutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutputPath>bin\x64-Release\</OutputPath>
   </PropertyGroup>
 
 </Project>

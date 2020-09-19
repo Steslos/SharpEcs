@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace Steslos.SharpEcs
+namespace SharpEcs
 {
     internal sealed class EntityManager
     {
@@ -11,18 +11,19 @@ namespace Steslos.SharpEcs
         {
             for (var i = 0; i < Entity.MaximumEntities; i++)
             {
-                availableEntities.Enqueue(new Entity(i));
+                availableEntities.Enqueue(new Entity());
             }
         }
 
         public Entity CreateEntity()
         {
-            Debug.Assert(availableEntities.Count > 0, "Too many entities used at once.");
+            Debug.Assert(availableEntities.Count > 0, "Exhaused available entities.");
             return availableEntities.Dequeue();
         }
 
         public void DestroyEntity(Entity entity)
         {
+            entity.Signature.ResetSignature();
             availableEntities.Enqueue(entity);
         }
     }

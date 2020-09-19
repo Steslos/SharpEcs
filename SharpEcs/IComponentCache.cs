@@ -1,4 +1,4 @@
-﻿namespace Steslos.SharpEcs
+﻿namespace SharpEcs
 {
     internal interface IComponentCache
     {
