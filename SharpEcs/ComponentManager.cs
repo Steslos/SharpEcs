@@ -27,6 +27,7 @@ namespace SharpEcs
 
         public void RegisterComponent<T>()
         {
+            Debug.Assert(nextComponentTypeBit < 64, "Too many components registered.");
             var componentName = typeof(T).Name;
             Debug.Assert(!componentCaches.ContainsKey(componentName), "Registering component more than once.");
             var componentCache = new ComponentCache<T>();
