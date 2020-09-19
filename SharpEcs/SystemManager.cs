@@ -32,13 +32,14 @@ namespace SharpEcs
         }
 
         internal void SetSystemSignature<T>(Signature signature)
+            where T : SharpEcsSystem
         {
             var systemName = typeof(T).Name;
             Debug.Assert(systems.ContainsKey(systemName), "System used before registering.");
-            systems[systemName].Signature.SetSignature(signature);
+            systems[systemName].Signature.AddSignature(signature);
         }
 
-        internal SharpEcsSystem RegisterSystem<T>()
+        internal T RegisterSystem<T>()
             where T : SharpEcsSystem, new()
         {
             var systemName = typeof(T).Name;

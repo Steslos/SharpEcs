@@ -3,6 +3,6 @@
     public sealed class Entity
     {
         public const int MaximumEntities = 8000;
-        internal Signature Signature => new Signature();
+        internal Signature Signature { get; } = new Signature();
     }
 }
