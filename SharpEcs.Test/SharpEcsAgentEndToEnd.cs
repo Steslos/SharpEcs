@@ -53,5 +53,19 @@ namespace SharpEcs.Test
             var returnedComponent = SharpEcsAgent.GetComponent<TestComponent>(system.Entities.First());
             Assert.IsTrue(returnedComponent.TestField == 5, $"Returned component did not have have the expected value. Value: {returnedComponent.TestField}");
         }
+
+        [TestMethod]
+        public void EndToEnd_CreateSingletonComponent_Works()
+        {
+            SharpEcsAgent.RegisterComponent<TestComponent>();
+            SharpEcsAgent.AddSingletonComponent(new TestComponent
+            {
+                TestField = 5
+            });
+
+            var returnedValue = SharpEcsAgent.GetSingletonComponent<TestComponent>().TestField;
+
+            Assert.IsTrue(returnedValue == 5, $"Did not return the expected value. Value: {returnedValue}");
+        }
     }
 }
